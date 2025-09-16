@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DvojityWendy Poems</title>
+  <style>
+    body { font-family: 'Georgia', serif; background: #f9f9f9; color: #222; margin: 0; padding: 0; }
+    header { background: #222; color: #fff; padding: 1rem; text-align: center; }
+    .poem-list { max-width: 800px; margin: 2rem auto; padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .poem { margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
+    .poem h2 { margin-top: 0; font-size: 1.3em; color: #444; }
+    .copyright { font-size: 0.9em; color: #888; margin-bottom: 0.5em; }
+    @media (max-width: 600px) { .poem-list { padding: 0.5rem; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DvojityWendy Poems</h1>
+    <p>All poems from the repository</p>
+  </header>
+  <main>
+    <div class="poem-list" id="poem-list">
+      Loading poems...
+    </div>
+  </main>
+  <script>
+    async function fetchPoems() {
+      const poemList = document.getElementById('poem-list');
+      const poemFiles = [];
+      for (let i = 1; i <= 92; i++) { // Adjust if more poems
+        poemFiles.push(`${String(i).padStart(3, '0')}.md`);
+      }
+      let html = '';
+      for (const file of poemFiles) {
+        try {
+          const res = await fetch(`../${file}`);
+          if (!res.ok) continue;
+          let text = await res.text();
+          // Extract copyright and title
+          let copyright = '';
+          let title = '';
+          let body = text;
+          const copyrightMatch = text.match(/\/\*\*([\s\S]*?)\*\//);
+          if (copyrightMatch) {
+            copyright = copyrightMatch[0].replace(/\n/g, '<br>');
+            body = text.replace(copyrightMatch[0], '').trim();
+          }
+          const titleMatch = body.match(/^([\w\s\-…#().,!?"'/]+)\n/);
+          if (titleMatch) {
+            title = titleMatch[1].trim();
+            body = body.replace(titleMatch[0], '').trim();
+          }
+          html += `<div class="poem"><div class="copyright">${copyright}</div><h2>${title}</h2><pre>${body}</pre></div>`;
+        } catch (e) { continue; }
+      }
+      poemList.innerHTML = html || '<p>No poems found.</p>';
+    }
+    fetchPoems();
+  </script>
+</body>
+</html>
