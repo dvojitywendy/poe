@@ -23,21 +23,26 @@
     <div class="poem-list" id="poem-list">
       Loading poems...
     </div>
+    <div style="text-align:center; margin:2rem 0;">
+      <button id="prev-btn" style="margin-right:1em;display:none;">Previous</button>
+      <span id="page-info"></span>
+      <button id="next-btn" style="margin-left:1em;display:none;">Next</button>
+    </div>
   </main>
   <script>
-    async function fetchPoems() {
-      const poemList = document.getElementById('poem-list');
-      const poemFiles = [];
-      for (let i = 1; i <= 92; i++) { // Adjust if more poems
-        poemFiles.push(`${String(i).padStart(3, '0')}.md`);
-      }
-      let html = '';
+    const POEMS_PER_PAGE = 8;
+    const TOTAL_POEMS = 92; // Adjust if more poems
+    const poemFiles = Array.from({length: TOTAL_POEMS}, (_, i) => `${String(i+1).padStart(3, '0')}.md`);
+    let poems = [];
+    let currentPage = 1;
+
+    async function loadPoems() {
+      poems = [];
       for (const file of poemFiles) {
         try {
           const res = await fetch(`../${file}`);
-          if (!res.ok) continue;
+          if (!res.ok) { poems.push(null); continue; }
           let text = await res.text();
-          // Extract copyright and title
           let copyright = '';
           let title = '';
           let body = text;
@@ -51,12 +56,53 @@
             title = titleMatch[1].trim();
             body = body.replace(titleMatch[0], '').trim();
           }
-          html += `<div class="poem"><div class="copyright">${copyright}</div><h2>${title}</h2><pre>${body}</pre></div>`;
-        } catch (e) { continue; }
+          poems.push({copyright, title, body});
+        } catch (e) {
+          poems.push(null);
+        }
+      }
+      renderPage(currentPage);
+    }
+
+    function renderPage(page) {
+      const poemList = document.getElementById('poem-list');
+      const start = (page-1)*POEMS_PER_PAGE;
+      const end = start + POEMS_PER_PAGE;
+      let html = '';
+      for (let i = start; i < end && i < poems.length; i++) {
+        const poem = poems[i];
+        if (!poem) continue;
+        html += `<div class="poem"><div class="copyright">${poem.copyright}</div><h2>${poem.title}</h2><pre>${poem.body}</pre></div>`;
       }
       poemList.innerHTML = html || '<p>No poems found.</p>';
+      updatePagination();
     }
-    fetchPoems();
+
+    function updatePagination() {
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const pageInfo = document.getElementById('page-info');
+      const totalPages = Math.ceil(poems.length / POEMS_PER_PAGE);
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+      prevBtn.style.display = currentPage > 1 ? '' : 'none';
+      nextBtn.style.display = currentPage < totalPages ? '' : 'none';
+    }
+
+    document.getElementById('prev-btn').onclick = function() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderPage(currentPage);
+      }
+    };
+    document.getElementById('next-btn').onclick = function() {
+      const totalPages = Math.ceil(poems.length / POEMS_PER_PAGE);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderPage(currentPage);
+      }
+    };
+
+    loadPoems();
   </script>
 </body>
 </html>
