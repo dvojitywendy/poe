@@ -40,7 +40,7 @@
       poems = [];
       for (const file of poemFiles) {
         try {
-          const res = await fetch(`../${file}`);
+          const res = await fetch(`${file}`);
           if (!res.ok) { poems.push(null); continue; }
           let text = await res.text();
           let copyright = '';
