@@ -13,22 +13,22 @@
       --bg-card: #fffaf0;
       --text: #3d2b1a;
       --text-muted: #b56a1e;
-      --accent: #ffb300;
+      --accent: #e65100;
       --border: #ffdca8;
       --shadow: 0 4px 20px rgba(230, 81, 0, 0.14);
-      --header-bg: #e65100;
-      --header-text: #fff3e0;
+      --header-bg: #ffb300;
+      --header-text: #3d2b1a;
     }
     :root[data-theme="dark"] {
       --bg: #1a1006;
       --bg-card: #241708;
       --text: #ffe8c9;
       --text-muted: #e0a24e;
-      --accent: #ffca28;
+      --accent: #ff8f00;
       --border: #3a2410;
       --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-      --header-bg: #140b04;
-      --header-text: #ffe8c9;
+      --header-bg: #ffca28;
+      --header-text: #1f1506;
     }
 
     * { box-sizing: border-box; }
@@ -295,8 +295,8 @@
       }
       function color() {
         return document.documentElement.getAttribute('data-theme') === 'dark'
-          ? '255, 202, 40'
-          : '255, 111, 0';
+          ? '255, 143, 0'
+          : '230, 81, 0';
       }
       function tick() {
         ctx.clearRect(0, 0, w, h);
