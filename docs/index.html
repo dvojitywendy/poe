@@ -9,23 +9,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4ece0;
+      --bg: #fff3e0;
       --bg-card: #fffaf0;
-      --text: #2a2520;
-      --text-muted: #8a7a66;
-      --accent: #8b5a3c;
-      --border: #e8ddc9;
-      --shadow: 0 4px 20px rgba(91, 60, 33, 0.08);
+      --text: #3d2b1a;
+      --text-muted: #b56a1e;
+      --accent: #ffb300;
+      --border: #ffdca8;
+      --shadow: 0 4px 20px rgba(230, 81, 0, 0.14);
       --header-bg: #2a2520;
       --header-text: #f4ece0;
     }
     :root[data-theme="dark"] {
-      --bg: #15110d;
-      --bg-card: #1f1a14;
-      --text: #ede2cd;
-      --text-muted: #9a8a72;
-      --accent: #d4a574;
-      --border: #2f2820;
+      --bg: #1a1006;
+      --bg-card: #241708;
+      --text: #ffe8c9;
+      --text-muted: #e0a24e;
+      --accent: #ffca28;
+      --border: #3a2410;
       --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
       --header-bg: #0d0a08;
       --header-text: #ede2cd;
@@ -67,7 +67,7 @@
       width: 96px;
       height: 96px;
       border-radius: 50%;
-      background: #fffaf0;
+      background: var(--bg-card);
       border: 2px solid var(--accent);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
       object-fit: contain;
@@ -87,7 +87,8 @@
     header p {
       margin: 0;
       font-style: italic;
-      color: var(--text-muted);
+      color: var(--header-text);
+      opacity: 0.75;
       font-size: 1.05rem;
     }
 
@@ -293,9 +294,7 @@
         }));
       }
       function color() {
-        return document.documentElement.getAttribute('data-theme') === 'dark'
-          ? '212, 165, 116'
-          : '139, 90, 60';
+        return '184, 134, 11';
       }
       function tick() {
         ctx.clearRect(0, 0, w, h);
