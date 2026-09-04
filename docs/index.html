@@ -6,330 +6,284 @@
   <title>DvojityWendy Poems</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Playfair+Display:wght@600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dr+Sugiyama&family=Caveat:wght@500;600;700&family=Playfair+Display:wght@600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f2ecd8;
-      --bg-card: #faf6e8;
-      --text: #2b2718;
-      --text-muted: #8c7c58;
-      --accent: #5f7f45;
-      --accent-wood: #8a5a2e;
-      --seal-red: #a83a2a;
-      --ink: #1c1811;
-      --border: #ddd0a4;
-      --shadow: 0 4px 20px rgba(90, 70, 30, 0.14);
-      --header-bg: #6b4423;
-      --header-text: #f2ecd8;
+      --fh: "Playfair Display", Georgia, serif;
+      --fb: "EB Garamond", Georgia, serif;
+      --ground: #4a2f18;
+      --grain: rgba(0, 0, 0, .20);
+      --grain-2: rgba(255, 255, 255, .045);
+      --paper: #f9f4ed;
+      --paper-edge: rgba(255, 255, 255, .7);
+      --wood-a: #402310;
+      --wood-b: #8c491a;
+      --wood-c: #5a2f14;
+      --ink: #2e2b25;
+      --ink-rgb: 46, 43, 37;
+      --muted: #82796a;
+      --bamboo: #4d7a2b;
+      --bamboo-mid: #8fa073;
+      --bamboo-soft: rgba(86, 99, 63, .18);
+      --seal: #a63a20;
+      --rail-text: rgba(249, 244, 237, .55);
+      --sheet-shadow: 0 18px 40px rgba(0, 0, 0, .42);
+      --on-wood: #f3e7d2;
+      --on-wood-dim: rgba(243, 231, 210, .62);
+      --table:
+        repeating-linear-gradient(92deg, var(--grain) 0 1px, transparent 1px 6px, var(--grain-2) 6px 7px, transparent 7px 23px),
+        repeating-linear-gradient(180deg, rgba(0, 0, 0, .22) 0 3px, transparent 3px 148px),
+        linear-gradient(180deg, rgba(255, 255, 255, .05), transparent 40%),
+        var(--ground);
     }
     :root[data-theme="dark"] {
-      --bg: #1b1810;
-      --bg-card: #242019;
-      --text: #ece3c8;
-      --text-muted: #a89566;
-      --accent: #86b463;
-      --accent-wood: #b9793f;
-      --seal-red: #c9503a;
-      --ink: #0b0a07;
-      --border: #3a3323;
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
-      --header-bg: #3a2814;
-      --header-text: #ece3c8;
+      --ground: #20130a;
+      --grain: rgba(0, 0, 0, .34);
+      --grain-2: rgba(255, 255, 255, .03);
+      --paper: #403830;
+      --paper-edge: rgba(255, 255, 255, .08);
+      --wood-a: #180d05;
+      --wood-b: #4a2510;
+      --wood-c: #221207;
+      --ink: #eee7db;
+      --ink-rgb: 238, 231, 219;
+      --muted: #a19786;
+      --bamboo: #a8d472;
+      --bamboo-soft: rgba(174, 191, 146, .20);
+      --seal: #c25a3a;
+      --rail-text: rgba(238, 231, 219, .45);
+      --sheet-shadow: 0 18px 44px rgba(0, 0, 0, .6);
+      --on-wood: #e8dcc8;
+      --on-wood-dim: rgba(232, 220, 200, .55);
     }
 
     * { box-sizing: border-box; }
 
-    html {
-      background-color: var(--bg);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-blend-mode: multiply;
-      transition: background-color 0.5s ease;
-    }
+    html { background: var(--ground); }
     body {
       margin: 0;
-      padding: 0;
-      background: transparent;
-      color: var(--text);
-      font-family: 'EB Garamond', Georgia, serif;
+      background: var(--ground);
+      color: var(--ink);
+      font-family: var(--fb);
       font-size: 19px;
-      line-height: 1.6;
-      transition: color 0.5s ease;
+      transition: background-color .5s ease, color .5s ease;
     }
+    a { color: var(--bamboo-mid); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover { color: var(--seal); }
+    ::selection { background: rgba(143, 160, 115, .35); }
+    :focus-visible { outline: 2px solid var(--bamboo); outline-offset: 3px; }
 
-    #particles {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
+    /* ---------- the table ---------- */
+    .table-top { position: fixed; inset: 0; z-index: 0; background: var(--table); }
+    .edge-left {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 34px; z-index: 4;
+      background: var(--table);
+      box-shadow: inset -14px 0 20px -14px rgba(0, 0, 0, .5);
     }
+    #petals, #ink { position: fixed; inset: 0; pointer-events: none; }
+    #petals { z-index: 6; }
+    #ink { z-index: 5; }
 
-    .calligraphy-dock {
-      position: fixed;
-      top: 50%;
-      right: 3vw;
-      transform: translateY(-48%);
-      width: 108px;
-      pointer-events: none;
-      opacity: 0.94;
-      filter: drop-shadow(0 10px 16px rgba(20, 15, 5, 0.22));
-      z-index: 1;
+    /* ---------- tool rail ---------- */
+    .rail {
+      position: fixed; right: 0; top: 0; bottom: 0; width: 200px; z-index: 4;
+      background: var(--table);
+      box-shadow: inset 16px 0 22px -16px rgba(0, 0, 0, .5);
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      gap: 40px; padding: 84px 0 28px; overflow-y: auto; overflow-x: hidden;
     }
-    .calligraphy-dock svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      overflow: visible;
+    .tool { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .tool-label {
+      font: 600 10px/1 var(--fb); letter-spacing: .22em;
+      text-transform: uppercase; color: var(--rail-text);
     }
-    @media (max-width: 1300px) {
-      .calligraphy-dock { display: none; }
+    .brush-bed { position: relative; height: 264px; width: 80px; display: flex; align-items: flex-start; justify-content: center; flex: none; }
+    .brush-rest {
+      position: absolute; top: 160px; left: 6px; width: 68px; height: 16px; border-radius: 999px;
+      background: linear-gradient(180deg, var(--wood-b), var(--wood-a));
+      box-shadow: 0 4px 10px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .12);
     }
+    .brush {
+      position: relative; z-index: 2; width: 26px; height: 252px;
+      display: flex; flex-direction: column; align-items: center; cursor: pointer;
+      transform: rotate(7deg); transform-origin: 50% 100%;
+      transition: transform .3s cubic-bezier(.2, .8, .3, 1);
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .35));
+    }
+    .brush:hover { transform: rotate(7deg) translateY(-10px); }
+    .brush-cap { width: 11px; height: 22px; border-radius: 999px 999px 3px 3px; background: linear-gradient(90deg, #3d472b, var(--bamboo-mid) 40%, #3d472b); }
+    .brush-handle {
+      width: 13px; height: 132px;
+      background:
+        repeating-linear-gradient(180deg, transparent 0 40px, rgba(0, 0, 0, .35) 40px 43px, transparent 43px 46px),
+        linear-gradient(90deg, #3d472b, var(--bamboo-mid) 38%, #56633f 70%, #2f3821);
+    }
+    .brush-ferrule { width: 17px; height: 24px; border-radius: 3px; background: linear-gradient(90deg, #645c50, #dcd3c4 40%, #a19786 70%, #474238); box-shadow: 0 1px 0 rgba(0, 0, 0, .3); }
+    .brush-tip { width: 19px; height: 74px; clip-path: polygon(6% 0, 94% 0, 66% 82%, 50% 100%, 34% 82%); background: linear-gradient(180deg, #474238, #201e1d 55%, #0f0d0b); }
 
-    header {
-      background-color: var(--header-bg);
-      background-image: repeating-linear-gradient(100deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 2px, transparent 2px, transparent 7px);
-      color: var(--header-text);
-      padding: 2.5rem 1rem 2rem;
-      text-align: center;
-      position: relative;
-      border-bottom: 3px solid var(--accent);
-      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+    .stamp-bed { position: relative; height: 110px; width: 80px; display: flex; align-items: flex-end; justify-content: center; flex: none; }
+    .stamp {
+      position: relative; width: 48px; height: 104px; border-radius: 12px 12px 5px 5px; cursor: pointer;
+      background:
+        repeating-linear-gradient(180deg, rgba(0, 0, 0, .10) 0 2px, transparent 2px 11px),
+        linear-gradient(90deg, var(--wood-a), var(--wood-b) 42%, var(--wood-c));
+      box-shadow: 0 8px 14px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .14);
+      transition: transform .25s cubic-bezier(.2, .8, .3, 1);
     }
-    .avatar {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      background: var(--bg-card);
-      border: 2px solid var(--accent);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-      object-fit: contain;
-      padding: 6px;
-      margin: 0 auto 1rem;
-      display: block;
-      transition: border-color 0.5s ease, transform 0.4s ease;
-    }
-    .avatar:hover { transform: scale(1.05) rotate(-2deg); }
-    header h1 {
-      font-family: 'Yuji Syuku', 'Playfair Display', Georgia, serif;
-      font-weight: 400;
-      font-size: clamp(2.1rem, 5vw, 3.1rem);
-      margin: 0 0 0.4rem;
-      letter-spacing: 0.03em;
-    }
-    header p {
-      margin: 0;
-      font-style: italic;
-      color: var(--header-text);
-      opacity: 0.75;
-      font-size: 1.05rem;
-    }
+    .stamp:hover { transform: translateY(-8px); }
+    .stamp-band { position: absolute; left: 5px; right: 5px; top: 34px; height: 9px; border-radius: 999px; background: linear-gradient(180deg, #dcd3c4, #82796a); opacity: .55; }
+    .stamp-face { position: absolute; left: 1px; right: 1px; bottom: 0; height: 20px; border-radius: 4px; background: var(--seal); box-shadow: 0 2px 6px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .22); }
+    @keyframes press { 0% { transform: translateY(0); } 35% { transform: translateY(16px); } 100% { transform: translateY(0); } }
+    .rail-hint { margin: 0; max-width: 132px; text-align: center; font: 400 11px/1.6 var(--fb); color: var(--rail-text); }
 
     .theme-toggle {
-      position: absolute;
-      top: 1.2rem;
-      right: 1.2rem;
-      background: transparent;
-      border: 1px solid var(--text-muted);
-      color: var(--header-text);
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+      position: absolute; top: 26px; right: 26px; width: 40px; height: 40px; border-radius: 999px;
+      border: 1px solid rgba(249, 244, 237, .28); background: rgba(0, 0, 0, .18); color: #f9f4ed;
+      display: grid; place-items: center; cursor: pointer; padding: 0;
+      transition: transform .3s ease, border-color .3s ease;
     }
-    .theme-toggle:hover { transform: rotate(20deg); border-color: var(--header-text); }
-    .theme-toggle svg { width: 18px; height: 18px; }
+    .theme-toggle:hover { transform: rotate(20deg); border-color: rgba(249, 244, 237, .7); }
     .theme-toggle .moon { display: none; }
     :root[data-theme="dark"] .theme-toggle .sun { display: none; }
     :root[data-theme="dark"] .theme-toggle .moon { display: block; }
 
-    main {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 2.5rem 1.25rem;
-    }
+    /* ---------- page + sheets ---------- */
+    .page { position: relative; z-index: 3; margin: 0 200px 0 34px; padding: 76px 48px 140px; }
+    .column { max-width: 720px; margin: 0 auto; }
 
-    .poem-list {
-      transition: opacity 0.35s ease, transform 0.35s ease;
+    header { display: flex; flex-direction: column; align-items: stretch; gap: 14px; margin: 0 0 58px; }
+    .avatar {
+      width: 88px; height: 88px; border-radius: 999px; background: var(--paper);
+      border: 2px solid var(--bamboo); padding: 6px; object-fit: contain;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, .18); flex: none; align-self: center;
     }
-    .poem-list.fading {
-      opacity: 0;
-      transform: translateY(12px);
+    header h1 {
+      margin: 0 0 6px; font-family: 'Dr Sugiyama', 'Caveat', cursive; font-weight: 400;
+      font-size: clamp(26px, 4vw, 44px); line-height: 1.24; padding: 8px 0 14px;
+      letter-spacing: .09em; text-align: center; color: var(--on-wood);
+      text-shadow: 0 2px 6px rgba(0, 0, 0, .35);
     }
+    header p { margin: 0; text-align: center; font: italic 400 17px/1.5 var(--fb); color: var(--on-wood-dim); }
 
-    .loading {
-      text-align: center;
-      color: var(--text-muted);
-      font-style: italic;
-      padding: 3rem 0;
-    }
+    .poem-list { transition: opacity .32s ease, transform .32s ease; }
+    .poem-list.fading { opacity: 0; transform: translateY(12px); }
+    .loading { text-align: center; color: var(--on-wood-dim); font-style: italic; padding: 3rem 0; }
 
-    .poem {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent-wood);
+    .sheet {
+      position: relative;
+      background:
+        linear-gradient(90deg, transparent 0 34px, var(--bamboo-soft) 34px 35px, transparent 35px),
+        repeating-linear-gradient(0deg, rgba(var(--ink-rgb), .022) 0 1px, transparent 1px 4px),
+        var(--paper);
       border-radius: 2px;
-      padding: 2rem 2.2rem;
-      margin-bottom: 2rem;
-      box-shadow: var(--shadow);
+      padding: 44px 52px 68px 72px;
+      margin: 0 0 46px;
+      box-shadow: var(--sheet-shadow), inset 0 1px 0 var(--paper-edge);
       opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
+      transform: translateY(26px) rotate(var(--tilt, 0deg));
+      transition: opacity .7s ease, transform .7s ease;
       transition-delay: calc(var(--i, 0) * 90ms);
     }
-    .poem.visible {
-      opacity: 1;
-      transform: translateY(0);
+    .sheet.visible { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
+    .copyright { font: 600 12px/1.4 var(--fb); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; white-space: pre-line; }
+    .sheet h2 { margin: 0 0 20px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
+    .poem-body { white-space: pre-wrap; font: 400 19px/1.78 var(--fb); color: var(--ink); }
+    .seal {
+      position: absolute; right: 46px; bottom: 24px; width: 64px; height: 82px;
+      opacity: 0; transform: scale(1.55) rotate(-7deg);
+      transition: opacity .3s ease, transform .3s cubic-bezier(.2, .8, .3, 1);
     }
+    .seal img { display: block; width: 100%; height: 100%; }
+    .seal.pressed { opacity: 1; transform: scale(1) rotate(-3deg); }
 
-    .copyright {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 0.8rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      white-space: pre-line;
-    }
-
-    .poem h2 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-weight: 600;
-      font-size: 1.7rem;
-      margin: 0 0 1.3rem;
-      padding-bottom: 0.9rem;
-      color: var(--text);
-      line-height: 1.25;
-      position: relative;
-    }
-    .poem h2::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 46px;
-      height: 3px;
-      border-radius: 2px;
-      background: var(--accent);
-    }
-
-    .poem-body {
-      white-space: pre-wrap;
-      font-size: 1.08rem;
-      line-height: 1.7;
-      color: var(--text);
-    }
-    .poem-body::first-letter {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 3.4em;
-      line-height: 0.85;
-      float: left;
-      margin: 0.08em 0.12em -0.05em 0;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .pagination {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-      margin: 2.5rem 0 1rem;
-      font-family: 'Playfair Display', Georgia, serif;
-    }
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 26px; margin: 8px 0 0; }
     .pagination button {
-      background: transparent;
-      border: 1px solid var(--accent-wood);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 1rem;
-      padding: 0.5rem 1.2rem;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+      display: flex; align-items: center; gap: 9px;
+      background: rgba(0, 0, 0, .22); border: 1px solid rgba(243, 231, 210, .34);
+      color: var(--on-wood); font: 400 17px/1 var(--fb); padding: 11px 20px; border-radius: 999px;
+      cursor: pointer; transition: background-color .25s ease, border-color .25s ease;
     }
-    .pagination button:hover {
-      background: var(--accent);
-      color: var(--bg-card);
-      border-color: var(--accent);
-    }
+    .pagination button:hover { background: rgba(0, 0, 0, .4); border-color: rgba(243, 231, 210, .75); }
     .pagination button[hidden] { display: none; }
-    .page-info {
-      color: var(--text-muted);
-      font-size: 1rem;
-      letter-spacing: 0.05em;
-    }
+    .page-info { font: 400 16px/1 var(--fb); letter-spacing: .1em; text-transform: uppercase; color: var(--on-wood-dim); }
 
-    @media (max-width: 600px) {
-      main { padding: 1.5rem 0.8rem; }
-      .poem { padding: 1.5rem 1.3rem; }
-      .poem-body::first-letter { font-size: 3em; }
+    @media (max-width: 860px) {
+      .rail { width: 132px; }
+      .page { margin: 0 132px 0 34px; padding: 56px 22px 100px; }
+      .sheet { padding: 34px 30px 62px 48px; }
     }
-
     @media (prefers-reduced-motion: reduce) {
-      .poem, .poem-list, body, header, .theme-toggle, .pagination button {
-        transition: none !important;
-      }
-      .poem { opacity: 1; transform: none; }
-      #particles { display: none; }
+      .sheet, .poem-list, body, .brush, .stamp, .pagination button { transition: none !important; }
+      .sheet { opacity: 1; transform: none !important; }
+      #petals { display: none; }
     }
   </style>
 </head>
 <body>
-  <canvas id="particles" aria-hidden="true"></canvas>
-  <aside class="calligraphy-dock" aria-hidden="true">
-    <svg viewBox="0 0 140 400" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="woodGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" style="stop-color: var(--accent-wood)"/>
-          <stop offset="1" style="stop-color: var(--header-bg)"/>
-        </linearGradient>
-        <linearGradient id="woodGrad2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" style="stop-color: var(--accent-wood)"/>
-          <stop offset="1" style="stop-color: var(--header-bg)"/>
-        </linearGradient>
-      </defs>
+  <div class="table-top" aria-hidden="true"></div>
+  <canvas id="petals" aria-hidden="true"></canvas>
+  <canvas id="ink" aria-hidden="true"></canvas>
+  <div class="edge-left" aria-hidden="true"></div>
 
-      <ellipse cx="118" cy="102" rx="18" ry="5" fill="var(--ink)" opacity="0.15"/>
-      <g transform="rotate(-26 75 78)">
-        <rect x="10" y="68" width="110" height="17" rx="8.5" fill="url(#woodGrad)" stroke="var(--ink)" stroke-width="1"/>
-        <line x1="18" y1="68" x2="18" y2="85" stroke="var(--ink)" stroke-width="0.6" opacity="0.3"/>
-        <line x1="60" y1="68" x2="60" y2="85" stroke="var(--ink)" stroke-width="0.6" opacity="0.2"/>
-        <rect x="102" y="66" width="9" height="21" rx="2.5" fill="var(--accent)"/>
-        <path d="M111,67 C129,62 139,71 132,84 C126,95 113,90 108,79 Z" fill="var(--ink)"/>
-        <path d="M124,80 Q135,85 130,96" stroke="var(--ink)" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.55"/>
-        <path d="M118,84 Q126,92 120,100" stroke="var(--ink)" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.4"/>
-      </g>
-
-      <ellipse cx="55" cy="352" rx="36" ry="6" fill="var(--seal-red)" opacity="0.22"/>
-      <g transform="translate(28 250) rotate(4)">
-        <rect x="0" y="0" width="54" height="66" rx="6" fill="url(#woodGrad2)" stroke="var(--ink)" stroke-width="1"/>
-        <rect x="7" y="8" width="40" height="38" rx="3" fill="none" stroke="var(--header-text)" stroke-width="1" opacity="0.3"/>
-        <rect x="-6" y="60" width="66" height="15" rx="5" fill="var(--seal-red)" stroke="var(--ink)" stroke-width="0.5"/>
-      </g>
-    </svg>
-  </aside>
-  <header>
-    <img class="avatar" src="avatar.png" alt="DvojityWendy" onerror="this.style.display='none'">
-    <h1>DvojityWendy Poems</h1>
-    <p>A collection in verse</p>
+  <aside class="rail">
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark">
-      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
-  </header>
-  <main>
-    <div class="poem-list" id="poem-list">
-      <div class="loading">Loading poems&hellip;</div>
+
+    <div class="tool">
+      <div class="brush-bed">
+        <div class="brush-rest" aria-hidden="true"></div>
+        <div class="brush" id="brush" role="button" tabindex="0" aria-label="Pick up the brush" title="Pick up the brush">
+          <div class="brush-cap"></div>
+          <div class="brush-handle"></div>
+          <div class="brush-ferrule"></div>
+          <div class="brush-tip"></div>
+        </div>
+      </div>
+      <span class="tool-label">brush</span>
     </div>
-    <div class="pagination">
-      <button id="prev-btn" hidden>&larr; Previous</button>
-      <span class="page-info" id="page-info"></span>
-      <button id="next-btn" hidden>Next &rarr;</button>
+
+    <div class="tool">
+      <div class="stamp-bed">
+        <div class="stamp" id="stamp" role="button" tabindex="0" aria-label="Press the seal onto the sheet" title="Press the seal onto the sheet">
+          <div class="stamp-band" aria-hidden="true"></div>
+          <div class="stamp-face" aria-hidden="true"></div>
+        </div>
+      </div>
+      <span class="tool-label">seal</span>
     </div>
-  </main>
+
+    <p class="rail-hint" id="rail-hint">Take the brush to leave ink on the paper. Press the seal onto a sheet.</p>
+  </aside>
+
+  <div class="page" id="page">
+    <div class="column">
+      <header>
+        <img class="avatar" src="avatar.png" alt="DvojityWendy" onerror="this.style.display='none'">
+        <div>
+          <h1>DvojityWendy poems</h1>
+          <p>A collection in verse</p>
+        </div>
+      </header>
+
+      <div class="poem-list" id="poem-list">
+        <div class="loading">Loading poems&hellip;</div>
+      </div>
+
+      <div class="pagination">
+        <button id="prev-btn" hidden>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          Previous
+        </button>
+        <span class="page-info" id="page-info"></span>
+        <button id="next-btn" hidden>
+          Next
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script>
     /* ---------- Theme ---------- */
@@ -343,56 +297,159 @@
       localStorage.setItem(THEME_KEY, next);
     };
 
-    /* ---------- Ambient particles ---------- */
-    (function particles() {
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const canvas = document.getElementById('particles');
-      const ctx = canvas.getContext('2d');
-      let w, h, dots;
-      const COUNT = 22;
+    function fitCanvas(c) {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      c.width = innerWidth * dpr;
+      c.height = innerHeight * dpr;
+      c.style.width = innerWidth + 'px';
+      c.style.height = innerHeight + 'px';
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return ctx;
+    }
 
-      function resize() {
-        w = canvas.width = innerWidth * devicePixelRatio;
-        h = canvas.height = innerHeight * devicePixelRatio;
-        canvas.style.width = innerWidth + 'px';
-        canvas.style.height = innerHeight + 'px';
-      }
-      function init() {
-        dots = Array.from({ length: COUNT }, () => ({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          r: (Math.random() * 1.8 + 0.6) * devicePixelRatio,
-          vy: -(Math.random() * 0.25 + 0.05) * devicePixelRatio,
-          vx: (Math.random() - 0.5) * 0.15 * devicePixelRatio,
-          sway: Math.random() * Math.PI * 2,
-          swaySpeed: Math.random() * 0.005 + 0.002,
-          alpha: Math.random() * 0.4 + 0.15
-        }));
-      }
-      function color() {
-        return '95, 127, 69';
-      }
-      function tick() {
-        ctx.clearRect(0, 0, w, h);
-        const c = color();
+    /* ---------- Sakura petals ---------- */
+    (function petals() {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const c = document.getElementById('petals');
+      let ctx = fitCanvas(c);
+      const COUNT = 14;
+      const make = () => ({
+        x: Math.random() * innerWidth,
+        y: Math.random() * innerHeight,
+        r: Math.random() * 4 + 3,
+        vy: Math.random() * 0.22 + 0.10,
+        vx: (Math.random() - 0.5) * 0.16,
+        rot: Math.random() * Math.PI,
+        spin: (Math.random() - 0.5) * 0.006,
+        sway: Math.random() * Math.PI * 2,
+        swaySpeed: Math.random() * 0.006 + 0.002,
+        a: Math.random() * 0.16 + 0.10
+      });
+      let dots = Array.from({ length: COUNT }, make);
+      addEventListener('resize', () => { ctx = fitCanvas(c); dots = Array.from({ length: COUNT }, make); });
+      (function tick() {
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
         for (const d of dots) {
           d.sway += d.swaySpeed;
-          d.x += d.vx + Math.sin(d.sway) * 0.2 * devicePixelRatio;
+          d.rot += d.spin;
+          d.x += d.vx + Math.sin(d.sway) * 0.34;
           d.y += d.vy;
-          if (d.y < -10) { d.y = h + 10; d.x = Math.random() * w; }
-          if (d.x < -10) d.x = w + 10;
-          if (d.x > w + 10) d.x = -10;
+          if (d.y > innerHeight + 14) { d.y = -14; d.x = Math.random() * innerWidth; }
+          if (d.x < -14) d.x = innerWidth + 14;
+          if (d.x > innerWidth + 14) d.x = -14;
+          ctx.save();
+          ctx.translate(d.x, d.y);
+          ctx.rotate(d.rot);
           ctx.beginPath();
-          ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${c}, ${d.alpha})`;
+          ctx.ellipse(0, 0, d.r, d.r * 0.58, 0, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(233,178,190,' + d.a + ')';
           ctx.fill();
+          ctx.restore();
         }
         requestAnimationFrame(tick);
-      }
-      resize();
-      init();
-      tick();
-      addEventListener('resize', () => { resize(); init(); });
+      })();
+    })();
+
+    /* ---------- Brush: ink traces that dry away ---------- */
+    const INK_LIFE = 4000;
+    let pts = [];
+    (function inkCanvas() {
+      const c = document.getElementById('ink');
+      let ctx = fitCanvas(c);
+      addEventListener('resize', () => { ctx = fitCanvas(c); });
+      const inkRGB = () => getComputedStyle(document.documentElement).getPropertyValue('--ink-rgb').trim() || '46,43,37';
+      (function tick() {
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        const now = performance.now();
+        pts = pts.filter(p => now - p.t < INK_LIFE);
+        const rgb = inkRGB();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        for (let i = 1; i < pts.length; i++) {
+          const a = pts[i - 1], b = pts[i];
+          if (b.t - a.t > 140) continue;
+          const alpha = Math.max(0, 1 - (now - b.t) / INK_LIFE) * 0.62;
+          ctx.strokeStyle = 'rgba(' + rgb + ',' + alpha + ')';
+          ctx.lineWidth = b.w;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+        requestAnimationFrame(tick);
+      })();
+    })();
+
+    (function tools() {
+      const brush = document.getElementById('brush');
+      const stamp = document.getElementById('stamp');
+      const page = document.getElementById('page');
+      const hint = document.getElementById('rail-hint');
+      let brushOn = false, last = null;
+
+      const setHint = t => { hint.textContent = t; };
+      const lift = () => {
+        brushOn = true;
+        Object.assign(brush.style, {
+          position: 'fixed', left: '0px', top: '0px', zIndex: '40',
+          pointerEvents: 'none', transition: 'none', opacity: '0', transformOrigin: '50% 100%'
+        });
+        page.style.cursor = 'none';
+        setHint('Draw across a sheet — the ink dries away. Click or press Esc to put the brush back.');
+      };
+      const putBack = () => {
+        brushOn = false;
+        last = null;
+        brush.removeAttribute('style');
+        page.style.cursor = '';
+        setHint('Take the brush to leave ink on the paper. Press the seal onto a sheet.');
+      };
+
+      brush.addEventListener('click', () => brushOn ? putBack() : lift());
+      brush.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); brushOn ? putBack() : lift(); }
+      });
+      addEventListener('keydown', e => { if (e.key === 'Escape' && brushOn) putBack(); });
+
+      addEventListener('pointermove', e => {
+        if (!brushOn) return;
+        brush.style.opacity = '1';
+        const bw = brush.offsetWidth || 26, bh = brush.offsetHeight || 252;
+        brush.style.transform = 'translate(' + (e.clientX - bw / 2) + 'px,' + (e.clientY - bh) + 'px) rotate(-24deg)';
+        if (!(e.target && e.target.closest && e.target.closest('.sheet'))) { last = null; return; }
+        const now = performance.now();
+        let w = 9;
+        if (last) {
+          const dt = Math.max(8, now - last.t);
+          const sp = Math.hypot(e.clientX - last.x, e.clientY - last.y) / dt;
+          w = Math.max(2.2, Math.min(13, 13 - sp * 5.5));
+        }
+        const p = { x: e.clientX, y: e.clientY, t: now, w };
+        pts.push(p);
+        if (pts.length > 900) pts.splice(0, pts.length - 900);
+        last = p;
+      }, { passive: true });
+
+      const press = () => {
+        stamp.style.animation = 'press .45s cubic-bezier(.3,.8,.3,1)';
+        setTimeout(() => { stamp.style.animation = ''; }, 460);
+        const mid = innerHeight / 2;
+        let best = null, bestD = Infinity;
+        for (const s of document.querySelectorAll('.sheet')) {
+          const r = s.getBoundingClientRect();
+          const d = Math.abs((r.top + r.bottom) / 2 - mid);
+          if (d < bestD) { bestD = d; best = s; }
+        }
+        if (!best) return;
+        const seal = best.querySelector('.seal');
+        if (seal) seal.classList.add('pressed');
+        setHint('Sealed. Scroll to another sheet and press again.');
+      };
+      stamp.addEventListener('click', press);
+      stamp.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); press(); }
+      });
     })();
 
     /* ---------- Poems ---------- */
@@ -401,7 +458,7 @@
     const poems = [];
     let currentPage = 1;
 
-    const fadeObserver = new IntersectionObserver((entries) => {
+    const fadeObserver = new IntersectionObserver(entries => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
@@ -452,17 +509,16 @@
         if (found.length === 0) break;
         const prevLen = poems.length;
         poems.push(...found);
-        // Re-render current page only if it could now have more visible poems
-        const visibleEnd = currentPage * POEMS_PER_PAGE;
-        if (prevLen < visibleEnd) renderPage(currentPage);
+        if (prevLen < currentPage * POEMS_PER_PAGE) renderPage(currentPage);
         else updatePagination();
         n += BATCH;
       }
       if (poems.length === 0) {
-        document.getElementById('poem-list').innerHTML =
-          '<div class="loading">No poems found.</div>';
+        document.getElementById('poem-list').innerHTML = '<div class="loading">No poems found.</div>';
       }
     }
+
+    const TILTS = [-0.24, 0.3, -0.16, 0.22, -0.28, 0.18, -0.2, 0.26];
 
     function renderPage(page) {
       const list = document.getElementById('poem-list');
@@ -472,28 +528,39 @@
 
       for (let i = start; i < end; i++) {
         const p = poems[i];
-        const div = document.createElement('div');
-        div.className = 'poem';
-        div.style.setProperty('--i', i - start);
+        const idx = i - start;
+        const sheet = document.createElement('article');
+        sheet.className = 'sheet';
+        sheet.style.setProperty('--i', idx);
+        sheet.style.setProperty('--tilt', TILTS[idx % TILTS.length] + 'deg');
 
         if (p.copyright) {
           const cr = document.createElement('div');
           cr.className = 'copyright';
           cr.textContent = p.copyright;
-          div.appendChild(cr);
+          sheet.appendChild(cr);
         }
 
         const h2 = document.createElement('h2');
         h2.textContent = p.title;
-        div.appendChild(h2);
+        sheet.appendChild(h2);
 
         const body = document.createElement('div');
         body.className = 'poem-body';
         body.textContent = p.body;
-        div.appendChild(body);
+        sheet.appendChild(body);
 
-        list.appendChild(div);
-        fadeObserver.observe(div);
+        const seal = document.createElement('div');
+        seal.className = 'seal';
+        seal.setAttribute('aria-hidden', 'true');
+        const img = document.createElement('img');
+        img.src = 'seal-block.svg';
+        img.alt = '';
+        seal.appendChild(img);
+        sheet.appendChild(seal);
+
+        list.appendChild(sheet);
+        fadeObserver.observe(sheet);
       }
       updatePagination();
     }
