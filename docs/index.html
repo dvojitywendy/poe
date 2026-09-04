@@ -31,9 +31,8 @@
       --on-wood: #f3e7d2;
       --on-wood-dim: rgba(243, 231, 210, .62);
       --table:
-        repeating-linear-gradient(92deg, var(--grain) 0 1px, transparent 1px 6px, var(--grain-2) 6px 7px, transparent 7px 23px),
-        repeating-linear-gradient(180deg, rgba(0, 0, 0, .22) 0 3px, transparent 3px 148px),
-        linear-gradient(180deg, rgba(255, 255, 255, .05), transparent 40%),
+        linear-gradient(180deg, rgba(255, 255, 255, .05), transparent 45%) no-repeat,
+        url('wood-texture.svg') repeat,
         var(--ground);
     }
     :root[data-theme="dark"] {

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Seamless procedurální šum pro mikro-strukturu dřeva -->
+    <filter id="seamlessWoodNoise" x="0%" y="0%" width="100%" height="100%">
+      <!-- stitchTiles="stitch" zajišťuje plynulé navazování šumu na okrajích -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.18" numOctaves="5" stitchTiles="stitch" result="noise" />
+      <feColorMatrix type="matrix" values="
+        0.28 0    0    0 0.12
+        0    0.18 0    0 0.07
+        0    0    0.10 0 0.03
+        0    0    0    0.35 0" in="noise" result="coloredNoise"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+
+    <!-- Základní tmavý přechod (navazuje nahoře i dole) -->
+    <linearGradient id="darkWoodBase" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#21130b"/>
+      <stop offset="50%" stop-color="#301b10"/>
+      <stop offset="100%" stop-color="#21130b"/>
+    </linearGradient>
+
+    <!-- Horizontální jemný stínový přechod -->
+    <linearGradient id="horizGrain" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#140b06" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#3a2215" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#140b06" stop-opacity="0.4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Podkladová barva -->
+  <rect width="600" height="600" fill="url(#darkWoodBase)"/>
+
+  <!-- Matná textura lét dřeva -->
+  <rect width="600" height="600" fill="#301b10" filter="url(#seamlessWoodNoise)"/>
+
+  <!-- Vrstva násobení pro hloubku bez odlesku -->
+  <rect width="600" height="600" fill="url(#horizGrain)" mix-blend-mode="multiply"/>
+
+  <!-- Plynule navazující křivky léta (konec nahoře odpovídá začátku dole) -->
+  <g opacity="0.35" stroke="#0f0703" fill="none" stroke-linecap="round">
+    <path d="M 0,0 C 150,20 450,-20 600,0" stroke-width="6"/>
+    <path d="M 0,600 C 150,620 450,580 600,600" stroke-width="6"/>
+
+    <path d="M 0,100 C 200,80 400,120 600,100" stroke-width="5"/>
+    <path d="M 0,220 C 180,250 420,190 600,220" stroke-width="7"/>
+    <path d="M 0,350 C 150,330 450,370 600,350" stroke-width="4"/>
+    <path d="M 0,480 C 220,510 380,450 600,480" stroke-width="6"/>
+
+    <!-- Doplňkové jemné linie -->
+    <path d="M 0,50 Q 300,70 600,50" stroke-width="2" opacity="0.6"/>
+    <path d="M 0,170 Q 300,150 600,170" stroke-width="3" opacity="0.5"/>
+    <path d="M 0,290 Q 300,310 600,290" stroke-width="2" opacity="0.7"/>
+    <path d="M 0,410 Q 300,390 600,410" stroke-width="3" opacity="0.6"/>
+    <path d="M 0,540 Q 300,560 600,540" stroke-width="2" opacity="0.5"/>
+  </g>
+</svg>
