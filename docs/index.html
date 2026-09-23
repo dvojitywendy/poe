@@ -491,17 +491,45 @@
     }
 
     function renderStanzas(container, body) {
-      const paragraphs = body.split(/\n[ \t]*\n+/);
-      for (const raw of paragraphs) {
-        if (!raw.trim()) continue;
-        const marker = raw.match(/^[ \t]*(<<|>>)[ \t]*/);
-        const text = marker ? raw.slice(marker[0].length) : raw;
+      let buffer = [];
+      let pendingAlign = null;
+
+      const flush = () => {
+        const text = buffer.join('\n').trim();
+        buffer = [];
+        const align = pendingAlign;
+        pendingAlign = null;
+        if (!text) return;
         const p = document.createElement('p');
         p.className = 'stanza';
-        if (marker) p.classList.add(marker[1] === '<<' ? 'align-right' : 'align-left');
+        if (align === 'right') p.classList.add('align-right');
+        else if (align === 'left') p.classList.add('align-left');
         p.textContent = text;
         container.appendChild(p);
+      };
+
+      for (const rawLine of body.split('\n')) {
+        const trimmed = rawLine.trim();
+        if (trimmed === '<<' || trimmed === '>>') {
+          flush();
+          pendingAlign = trimmed === '<<' ? 'right' : 'left';
+          continue;
+        }
+        if (trimmed === '') {
+          flush();
+          continue;
+        }
+        if (buffer.length === 0) {
+          const inline = rawLine.match(/^[ \t]*(<<|>>)[ \t]*(.*)$/);
+          if (inline) {
+            pendingAlign = inline[1] === '<<' ? 'right' : 'left';
+            if (inline[2]) buffer.push(inline[2]);
+            continue;
+          }
+        }
+        buffer.push(rawLine);
       }
+      flush();
     }
 
     async function fetchPoem(n) {
