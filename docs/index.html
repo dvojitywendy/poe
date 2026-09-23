@@ -185,6 +185,10 @@
     .copyright { font: 600 12px/1.4 var(--fb); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; white-space: pre-line; }
     .sheet h2 { margin: 0 0 20px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
     .poem-body { white-space: pre-wrap; font: 400 19px/1.78 var(--fb); color: var(--ink); }
+    .poem-body .stanza { margin: 0 0 1.2em; }
+    .poem-body .stanza:last-child { margin-bottom: 0; }
+    .poem-body .stanza.align-right { text-align: right; }
+    .poem-body .stanza.align-left { text-align: left; }
     .seal {
       position: absolute; right: 46px; bottom: 24px; width: 64px; height: 82px;
       opacity: 0; transform: scale(1.55) rotate(-7deg);
@@ -486,6 +490,20 @@
       return { copyright, title, body };
     }
 
+    function renderStanzas(container, body) {
+      const paragraphs = body.split(/\n[ \t]*\n+/);
+      for (const raw of paragraphs) {
+        if (!raw.trim()) continue;
+        const marker = raw.match(/^[ \t]*(<<|>>)[ \t]*/);
+        const text = marker ? raw.slice(marker[0].length) : raw;
+        const p = document.createElement('p');
+        p.className = 'stanza';
+        if (marker) p.classList.add(marker[1] === '<<' ? 'align-right' : 'align-left');
+        p.textContent = text;
+        container.appendChild(p);
+      }
+    }
+
     async function fetchPoem(n) {
       try {
         const res = await fetch(`${String(n).padStart(3, '0')}.md`);
@@ -544,7 +562,7 @@
 
         const body = document.createElement('div');
         body.className = 'poem-body';
-        body.textContent = p.body;
+        renderStanzas(body, p.body);
         sheet.appendChild(body);
 
         const seal = document.createElement('div');
