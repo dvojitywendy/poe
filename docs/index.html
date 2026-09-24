@@ -189,6 +189,7 @@
     .poem-body .stanza:last-child { margin-bottom: 0; }
     .poem-body .stanza.align-right { text-align: right; }
     .poem-body .stanza.align-left { text-align: left; }
+    .poem-body .stanza.note { font-style: italic; font-size: 0.92em; color: var(--muted); }
     .seal {
       position: absolute; right: 46px; bottom: 24px; width: 64px; height: 82px;
       opacity: 0; transform: scale(1.55) rotate(-7deg);
@@ -493,39 +494,62 @@
     function renderStanzas(container, body) {
       let buffer = [];
       let pendingAlign = null;
+      let pendingNote = false;
 
       const flush = () => {
         const text = buffer.join('\n').trim();
         buffer = [];
         const align = pendingAlign;
+        const note = pendingNote;
         pendingAlign = null;
+        pendingNote = false;
         if (!text) return;
         const p = document.createElement('p');
         p.className = 'stanza';
         if (align === 'right') p.classList.add('align-right');
         else if (align === 'left') p.classList.add('align-left');
+        if (note) p.classList.add('note');
         p.textContent = text;
         container.appendChild(p);
       };
 
+      // Strips leading '<<' (align right), '>>' (align left) and '##' (note)
+      // markers from the start of a line; markers can be combined and appear
+      // in any order (e.g. '<< ##' or '## << text').
+      const stripMarkers = (str) => {
+        let rest = str, align = null, note = false, matched = false;
+        while (true) {
+          const m = rest.match(/^[ \t]*(<<|>>|##)[ \t]*/);
+          if (!m) break;
+          matched = true;
+          if (m[1] === '<<') align = 'right';
+          else if (m[1] === '>>') align = 'left';
+          else note = true;
+          rest = rest.slice(m[0].length);
+        }
+        return { rest, align, note, matched };
+      };
+
       for (const rawLine of body.split('\n')) {
-        const trimmed = rawLine.trim();
-        if (trimmed === '<<' || trimmed === '>>') {
-          flush();
-          pendingAlign = trimmed === '<<' ? 'right' : 'left';
-          continue;
-        }
-        if (trimmed === '') {
+        if (rawLine.trim() === '') {
           flush();
           continue;
         }
-        if (buffer.length === 0) {
-          const inline = rawLine.match(/^[ \t]*(<<|>>)[ \t]*(.*)$/);
-          if (inline) {
-            pendingAlign = inline[1] === '<<' ? 'right' : 'left';
-            if (inline[2]) buffer.push(inline[2]);
-            continue;
-          }
+        const { rest, align, note, matched } = stripMarkers(rawLine);
+        if (matched && rest.trim() === '') {
+          // Marker(s) alone on a line: flush the stanza so far, then arm the
+          // markers for the stanza that follows.
+          flush();
+          if (align) pendingAlign = align;
+          if (note) pendingNote = note;
+          continue;
+        }
+        if (matched && buffer.length === 0) {
+          // Inline marker(s) at the start of a fresh stanza.
+          if (align) pendingAlign = align;
+          if (note) pendingNote = note;
+          buffer.push(rest);
+          continue;
         }
         buffer.push(rawLine);
       }
