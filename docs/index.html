@@ -408,16 +408,30 @@
           ctx.quadraticCurveTo(b.x, b.y, midB.x, midB.y);
           ctx.stroke();
         }
-        // Round off the very start of each stroke with a filled dab, since
-        // the butt-capped curve above begins flat (and a touch in from the
-        // first recorded point, at its midpoint with the second).
-        for (const p of pts) {
+        // Taper the very start of each stroke into a triangle: the apex
+        // sits exactly at the touch-down point, and the base sits exactly
+        // where the curve above begins (the midpoint with the next point),
+        // at that curve's width — so it tapers to a point against the
+        // direction of travel with no gap or overlap where it meets the
+        // stroke.
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i];
           if (!p.start) continue;
+          const next = pts[i + 1];
           const alpha = Math.max(0, 1 - (now - p.t) / INK_LIFE) * 0.62;
           if (alpha <= 0) continue;
+          const dx = next.x - p.x, dy = next.y - p.y;
+          const dist = Math.hypot(dx, dy) || 1;
+          const dirX = dx / dist, dirY = dy / dist;
+          const perpX = -dirY, perpY = dirX;
+          const baseX = (p.x + next.x) / 2, baseY = (p.y + next.y) / 2;
+          const halfW = p.w / 2;
           ctx.beginPath();
           ctx.fillStyle = 'rgba(' + rgb + ',' + alpha + ')';
-          ctx.arc(p.x, p.y, p.w / 2, 0, Math.PI * 2);
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(baseX + perpX * halfW, baseY + perpY * halfW);
+          ctx.lineTo(baseX - perpX * halfW, baseY - perpY * halfW);
+          ctx.closePath();
           ctx.fill();
         }
         requestAnimationFrame(tick);
