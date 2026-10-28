@@ -218,15 +218,18 @@
     .page-info { font: 400 16px/1 var(--fb); letter-spacing: .1em; text-transform: uppercase; color: var(--on-wood-dim); }
 
     @media (max-width: 860px) {
-      .rail { width: 132px; }
       .page { margin: 0 132px 0 34px; padding: 56px 22px 100px; }
       .sheet { padding: 34px 30px 62px 48px; }
     }
     /* Mobile (either orientation) and touch devices: the brush drag relies on
        pointermove, which touch doesn't fire the same way as a mouse, leaving
-       it stuck mid-drag. Simplest fix is to not offer the tools there. */
+       it stuck mid-drag. Simplest fix is to not offer the tools there. With
+       the tools gone the rail only needs to hold the theme toggle, so shrink
+       it (and the page's margin for it) instead of leaving dead space. */
     @media (max-width: 860px), (hover: none) and (pointer: coarse) {
       .tool, .rail-hint { display: none; }
+      .rail { width: 72px; }
+      .page { margin-right: 72px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .sheet, .poem-list, body, .brush, .stamp, .pagination button { transition: none !important; }
