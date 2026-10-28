@@ -383,17 +383,29 @@
         const now = performance.now();
         pts = pts.filter(p => now - p.t < INK_LIFE);
         const rgb = inkRGB();
-        ctx.lineCap = 'round';
+        ctx.lineCap = 'butt';
         ctx.lineJoin = 'round';
-        for (let i = 1; i < pts.length; i++) {
-          const a = pts[i - 1], b = pts[i];
-          if (b.t - a.t > 140) continue;
+        // Draw a quadratic curve through the midpoint of each consecutive
+        // pair, using the point between them as the curve's control point.
+        // That smooths out the raw, sparsely-sampled pointer positions into
+        // a continuous stroke instead of straight, separately-capped segments.
+        // Segments butt up against each other exactly (this curve's end is
+        // the next curve's start), so a round cap isn't needed to bridge
+        // them — it would just double up into a bead at every join. Width
+        // is averaged over neighbouring points too, so it tapers instead of
+        // stair-stepping where the recorded stroke width jumps between
+        // samples.
+        for (let i = 1; i < pts.length - 1; i++) {
+          const a = pts[i - 1], b = pts[i], c2 = pts[i + 1];
+          if (b.t - a.t > 300 || c2.t - b.t > 300) continue;
+          const midA = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+          const midB = { x: (b.x + c2.x) / 2, y: (b.y + c2.y) / 2 };
           const alpha = Math.max(0, 1 - (now - b.t) / INK_LIFE) * 0.62;
           ctx.strokeStyle = 'rgba(' + rgb + ',' + alpha + ')';
-          ctx.lineWidth = b.w;
+          ctx.lineWidth = (a.w + b.w + c2.w) / 3;
           ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
+          ctx.moveTo(midA.x, midA.y);
+          ctx.quadraticCurveTo(b.x, b.y, midB.x, midB.y);
           ctx.stroke();
         }
         requestAnimationFrame(tick);
