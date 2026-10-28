@@ -408,6 +408,18 @@
           ctx.quadraticCurveTo(b.x, b.y, midB.x, midB.y);
           ctx.stroke();
         }
+        // Round off the very start of each stroke with a filled dab, since
+        // the butt-capped curve above begins flat (and a touch in from the
+        // first recorded point, at its midpoint with the second).
+        for (const p of pts) {
+          if (!p.start) continue;
+          const alpha = Math.max(0, 1 - (now - p.t) / INK_LIFE) * 0.62;
+          if (alpha <= 0) continue;
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(' + rgb + ',' + alpha + ')';
+          ctx.arc(p.x, p.y, p.w / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
         requestAnimationFrame(tick);
       })();
     })();
@@ -451,12 +463,13 @@
         if (!(e.target && e.target.closest && e.target.closest('.sheet'))) { last = null; return; }
         const now = performance.now();
         let w = 9;
+        const isStart = !last;
         if (last) {
           const dt = Math.max(8, now - last.t);
           const sp = Math.hypot(e.clientX - last.x, e.clientY - last.y) / dt;
           w = Math.max(2.2, Math.min(13, 13 - sp * 5.5));
         }
-        const p = { x: e.clientX, y: e.clientY, t: now, w };
+        const p = { x: e.clientX, y: e.clientY, t: now, w, start: isStart };
         pts.push(p);
         if (pts.length > 900) pts.splice(0, pts.length - 900);
         last = p;
