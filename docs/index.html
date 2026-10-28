@@ -383,18 +383,56 @@
         const now = performance.now();
         pts = pts.filter(p => now - p.t < INK_LIFE);
         const rgb = inkRGB();
-        ctx.lineCap = 'round';
+        ctx.lineCap = 'butt';
         ctx.lineJoin = 'round';
-        for (let i = 1; i < pts.length; i++) {
-          const a = pts[i - 1], b = pts[i];
-          if (b.t - a.t > 140) continue;
+        // Draw a quadratic curve through the midpoint of each consecutive
+        // pair, using the point between them as the curve's control point.
+        // That smooths out the raw, sparsely-sampled pointer positions into
+        // a continuous stroke instead of straight, separately-capped segments.
+        // Segments butt up against each other exactly (this curve's end is
+        // the next curve's start), so a round cap isn't needed to bridge
+        // them — it would just double up into a bead at every join. Width
+        // is averaged over neighbouring points too, so it tapers instead of
+        // stair-stepping where the recorded stroke width jumps between
+        // samples.
+        for (let i = 1; i < pts.length - 1; i++) {
+          const a = pts[i - 1], b = pts[i], c2 = pts[i + 1];
+          if (b.t - a.t > 300 || c2.t - b.t > 300) continue;
+          const midA = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+          const midB = { x: (b.x + c2.x) / 2, y: (b.y + c2.y) / 2 };
           const alpha = Math.max(0, 1 - (now - b.t) / INK_LIFE) * 0.62;
           ctx.strokeStyle = 'rgba(' + rgb + ',' + alpha + ')';
-          ctx.lineWidth = b.w;
+          ctx.lineWidth = (a.w + b.w + c2.w) / 3;
           ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
+          ctx.moveTo(midA.x, midA.y);
+          ctx.quadraticCurveTo(b.x, b.y, midB.x, midB.y);
           ctx.stroke();
+        }
+        // Taper the very start of each stroke into a triangle: the apex
+        // sits exactly at the touch-down point, and the base sits exactly
+        // where the curve above begins (the midpoint with the next point),
+        // at that curve's width — so it tapers to a point against the
+        // direction of travel with no gap or overlap where it meets the
+        // stroke.
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i];
+          if (!p.start) continue;
+          const next = pts[i + 1];
+          const alpha = Math.max(0, 1 - (now - p.t) / INK_LIFE) * 0.62;
+          if (alpha <= 0) continue;
+          const dx = next.x - p.x, dy = next.y - p.y;
+          const dist = Math.hypot(dx, dy) || 1;
+          const dirX = dx / dist, dirY = dy / dist;
+          const perpX = -dirY, perpY = dirX;
+          const baseX = (p.x + next.x) / 2, baseY = (p.y + next.y) / 2;
+          const halfW = p.w / 2;
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(' + rgb + ',' + alpha + ')';
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(baseX + perpX * halfW, baseY + perpY * halfW);
+          ctx.lineTo(baseX - perpX * halfW, baseY - perpY * halfW);
+          ctx.closePath();
+          ctx.fill();
         }
         requestAnimationFrame(tick);
       })();
@@ -439,12 +477,13 @@
         if (!(e.target && e.target.closest && e.target.closest('.sheet'))) { last = null; return; }
         const now = performance.now();
         let w = 9;
+        const isStart = !last;
         if (last) {
           const dt = Math.max(8, now - last.t);
           const sp = Math.hypot(e.clientX - last.x, e.clientY - last.y) / dt;
           w = Math.max(2.2, Math.min(13, 13 - sp * 5.5));
         }
-        const p = { x: e.clientX, y: e.clientY, t: now, w };
+        const p = { x: e.clientX, y: e.clientY, t: now, w, start: isStart };
         pts.push(p);
         if (pts.length > 900) pts.splice(0, pts.length - 900);
         last = p;
