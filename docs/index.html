@@ -45,6 +45,7 @@
       /* A simplified Chinese decorative knot: a diamond with a small loop
          at each side, used as a CSS mask so --seal supplies the colour. */
       --knot-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='7' width='10' height='10' rx='1.6' transform='rotate(45 12 12)'/%3E%3Ccircle cx='12' cy='3.2' r='2.3'/%3E%3Ccircle cx='20.8' cy='12' r='2.3'/%3E%3Ccircle cx='12' cy='20.8' r='2.3'/%3E%3Ccircle cx='3.2' cy='12' r='2.3'/%3E%3C/svg%3E");
+      --heart-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12,21.35l-1.45-1.32C5.4,15.36,2,12.28,2,8.5C2,5.42,4.42,3,7.5,3c1.74,0,3.41,0.81,4.5,2.09C13.09,3.81,14.76,3,16.5,3C19.58,3,22,5.42,22,8.5c0,3.78-3.4,6.86-8.55,11.54L12,21.35z'/%3E%3C/svg%3E");
     }
     :root[data-theme="dark"] {
       --ground: #20130a;
@@ -198,29 +199,33 @@
     .sheet h2 { margin: 0 0 16px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
     .tags {
       position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 22px;
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 28px;
       width: max-content; max-width: calc(100% - 40px);
     }
-    .tag {
-      position: relative;
-      font: 600 11px/1 var(--fb); letter-spacing: .07em; text-transform: uppercase;
-      color: var(--bamboo); background: var(--bamboo-soft);
-      border-radius: 999px; padding: 7px 13px;
-    }
-    /* A short red cord threaded through a simplified Chinese knot above
-       each tag, like a paper gift tag strung from it. The knot is a CSS
-       mask (any opaque shape works — colour comes from background-color),
-       so it stays theme-correct for free and leaves room to later layer a
-       white per-tag icon (heart, teardrop, ...) on top of it. */
+    /* Each tag is the knot itself (no text pill): a short red cord hangs
+       it from the paper's edge, and a white icon sits centered on top of
+       it, identifying the tag (heart below is a placeholder for all tags
+       until there's a per-tag icon mapping). The knot is a CSS mask — any
+       opaque shape works, colour comes from background-color — so it
+       stays theme-correct for free and the icon layers on top as its own
+       masked element rather than needing to be baked into the knot shape. */
+    .tag { position: relative; width: 32px; height: 32px; flex: none; }
     .tag::before {
       content: ''; position: absolute; left: 50%; top: -14px; transform: translateX(-50%);
-      width: 1.5px; height: 13px; background: var(--seal);
+      width: 1.5px; height: 14px; background: var(--seal);
     }
     .tag::after {
-      content: ''; position: absolute; left: 50%; top: -32px; transform: translateX(-50%);
-      width: 19px; height: 19px; background: var(--seal);
+      content: ''; position: absolute; inset: 0; background: var(--seal);
       -webkit-mask: var(--knot-svg) center / contain no-repeat;
       mask: var(--knot-svg) center / contain no-repeat;
+    }
+    .tag-icon {
+      position: absolute; left: 50%; top: 53%; transform: translate(-50%, -50%); z-index: 1;
+      width: 13px; height: 13px; background: #fff;
+    }
+    .tag-icon--heart {
+      -webkit-mask: var(--heart-svg) center / contain no-repeat;
+      mask: var(--heart-svg) center / contain no-repeat;
     }
     .poem-body { white-space: pre-wrap; font: 400 19px/1.78 var(--fb); color: var(--ink); }
     .poem-body .stanza { margin: 0 0 1.2em; }
@@ -787,7 +792,16 @@
           for (const t of p.tags) {
             const chip = document.createElement('span');
             chip.className = 'tag';
-            chip.textContent = t;
+            // The icon is a placeholder (heart for every tag) until there's
+            // a per-tag icon mapping; the tag name lives on as the
+            // accessible name and hover title so it isn't lost in the
+            // meantime.
+            chip.setAttribute('role', 'img');
+            chip.setAttribute('aria-label', t);
+            chip.title = t;
+            const icon = document.createElement('span');
+            icon.className = 'tag-icon tag-icon--heart';
+            chip.appendChild(icon);
             tagsRow.appendChild(chip);
           }
           sheet.appendChild(tagsRow);
