@@ -42,6 +42,13 @@
         linear-gradient(180deg, rgba(255, 255, 255, .05), transparent 45%) no-repeat,
         url('wood-texture.svg') repeat,
         var(--ground);
+      /* A simplified Chinese decorative knot: a diamond with a small loop
+         at each side, used as a CSS mask so --seal supplies the colour. */
+      --knot-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='7' width='10' height='10' rx='1.6' transform='rotate(45 12 12)'/%3E%3Ccircle cx='12' cy='3.2' r='2.3'/%3E%3Ccircle cx='20.8' cy='12' r='2.3'/%3E%3Ccircle cx='12' cy='20.8' r='2.3'/%3E%3Ccircle cx='3.2' cy='12' r='2.3'/%3E%3C/svg%3E");
+      --heart-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12,21.35l-1.45-1.32C5.4,15.36,2,12.28,2,8.5C2,5.42,4.42,3,7.5,3c1.74,0,3.41,0.81,4.5,2.09C13.09,3.81,14.76,3,16.5,3C19.58,3,22,5.42,22,8.5c0,3.78-3.4,6.86-8.55,11.54L12,21.35z'/%3E%3C/svg%3E");
+      /* A small tassel: a rounded collar, then five fringe threads of
+         slightly uneven length for a less mechanical, hand-made look. */
+      --tassel-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 21'%3E%3Crect x='5.5' y='0' width='5' height='4' rx='2'/%3E%3Crect x='2.5' y='5' width='1.4' height='13' rx='0.7'/%3E%3Crect x='4.9' y='4.5' width='1.4' height='14' rx='0.7'/%3E%3Crect x='7.3' y='4' width='1.6' height='15.5' rx='0.8'/%3E%3Crect x='9.9' y='4.5' width='1.4' height='14' rx='0.7'/%3E%3Crect x='12.3' y='5' width='1.4' height='13' rx='0.7'/%3E%3C/svg%3E");
     }
     :root[data-theme="dark"] {
       --ground: #20130a;
@@ -192,7 +199,47 @@
     }
     .sheet.visible { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
     .copyright { font: 600 12px/1.4 var(--fb); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; white-space: pre-line; }
-    .sheet h2 { margin: 0 0 20px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
+    .sheet h2 { margin: 0 0 16px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
+    .tags {
+      position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 28px;
+      width: max-content; max-width: calc(100% - 40px);
+    }
+    /* Each tag is the knot itself (no text pill): a short red cord hangs
+       it from the paper's edge, and a white icon sits centered on top of
+       it, identifying the tag (heart below is a placeholder for all tags
+       until there's a per-tag icon mapping). The knot is a CSS mask — any
+       opaque shape works, colour comes from background-color — so it
+       stays theme-correct for free and the icon layers on top as its own
+       masked element rather than needing to be baked into the knot shape. */
+    .tag { position: relative; width: 32px; height: 32px; flex: none; }
+    .tag::before {
+      content: ''; position: absolute; left: 50%; top: -14px; transform: translateX(-50%);
+      width: 1.5px; height: 14px; background: var(--seal);
+    }
+    .tag::after {
+      content: ''; position: absolute; inset: 0; background: var(--seal);
+      -webkit-mask: var(--knot-svg) center / contain no-repeat;
+      mask: var(--knot-svg) center / contain no-repeat;
+    }
+    .tag-icon {
+      position: absolute; left: 50%; top: 53%; transform: translate(-50%, -50%); z-index: 1;
+      width: 13px; height: 13px; background: #fff;
+    }
+    .tag-icon--heart {
+      -webkit-mask: var(--heart-svg) center / contain no-repeat;
+      mask: var(--heart-svg) center / contain no-repeat;
+    }
+    .tag-cord-bottom {
+      position: absolute; left: 50%; top: 100%; transform: translateX(-50%);
+      width: 1.5px; height: 7px; background: var(--seal);
+    }
+    .tag-tassel {
+      position: absolute; left: 50%; top: calc(100% + 7px); transform: translateX(-50%);
+      width: 14px; height: 18px; background: var(--seal);
+      -webkit-mask: var(--tassel-svg) center / contain no-repeat;
+      mask: var(--tassel-svg) center / contain no-repeat;
+    }
     .poem-body { white-space: pre-wrap; font: 400 19px/1.78 var(--fb); color: var(--ink); }
     .poem-body .stanza { margin: 0 0 1.2em; }
     .poem-body .stanza:last-child { margin-bottom: 0; }
@@ -206,6 +253,29 @@
     }
     .seal img { display: block; width: 100%; height: 100%; }
     .seal.pressed { opacity: 1; transform: scale(1) rotate(-3deg); }
+
+    .permalink {
+      position: absolute; left: 46px; bottom: 28px; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none; border-radius: 999px;
+      color: var(--muted); opacity: .5; cursor: pointer; padding: 0;
+      transition: opacity .2s ease, color .2s ease, background-color .2s ease;
+    }
+    .permalink svg { width: 15px; height: 15px; }
+    .permalink:hover, .permalink:focus-visible { opacity: 1; color: var(--bamboo); background: var(--bamboo-soft); }
+    .permalink::after {
+      content: 'Copied'; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: var(--paper); font: 600 10px/1 var(--fb); letter-spacing: .05em;
+      padding: 5px 9px; border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .permalink.copied::after { opacity: 1; }
+
+    @keyframes sheetHighlight {
+      0%, 100% { box-shadow: var(--sheet-shadow), inset 0 1px 0 var(--paper-edge); }
+      25% { box-shadow: var(--sheet-shadow), inset 0 1px 0 var(--paper-edge), 0 0 0 3px var(--bamboo); }
+    }
+    .sheet.highlight { animation: sheetHighlight 1.8s ease; }
 
     .pagination { display: flex; align-items: center; justify-content: center; gap: 26px; margin: 8px 0 0; }
     .pagination button {
@@ -528,12 +598,21 @@
 
     function parsePoem(text) {
       let copyright = '';
+      let tags = [];
       const crMatch = text.match(/\/\*\*([\s\S]*?)\*\//);
       if (crMatch) {
-        copyright = crMatch[1]
+        const cleaned = crMatch[1]
           .replace(/^\s*\*\s?/gm, '')
-          .replace(/(\d{4})\s*-\s*\d{4}/, `$1-${CURRENT_YEAR}`)
-          .trim();
+          .replace(/(\d{4})\s*-\s*\d{4}/, `$1-${CURRENT_YEAR}`);
+        // An optional 'Tags: foo, bar' line anywhere in the comment block is
+        // pulled out into its own array instead of being shown as copyright text.
+        const keptLines = [];
+        for (const line of cleaned.split('\n')) {
+          const tagMatch = line.match(/^\s*tags?:\s*(.+?)\s*$/i);
+          if (tagMatch) tags = tagMatch[1].split(',').map(t => t.trim()).filter(Boolean);
+          else keptLines.push(line);
+        }
+        copyright = keptLines.join('\n').trim();
         text = text.replace(crMatch[0], '');
       }
       const lines = text.split('\n');
@@ -543,7 +622,7 @@
         title = lines[titleIdx].trim();
         body = lines.slice(titleIdx + 1).join('\n').trim();
       }
-      return { copyright, title, body };
+      return { copyright, title, body, tags };
     }
 
     function renderStanzas(container, body) {
@@ -613,16 +692,59 @@
 
     async function fetchPoem(n) {
       try {
-        const res = await fetch(`${String(n).padStart(3, '0')}.md`);
+        const id = String(n).padStart(3, '0');
+        const res = await fetch(`${id}.md`);
         if (!res.ok) return null;
-        return parsePoem(await res.text());
+        const parsed = parsePoem(await res.text());
+        parsed.id = id;
+        return parsed;
       } catch {
         return null;
       }
     }
 
+    /* ---------- Permalinks ---------- */
+    function goToPoemId(id, { scroll = true } = {}) {
+      const idx = poems.findIndex(p => p.id === id);
+      if (idx === -1) return false;
+      const targetPage = Math.floor(idx / POEMS_PER_PAGE) + 1;
+      if (targetPage !== currentPage) {
+        currentPage = targetPage;
+        renderPage(currentPage);
+      }
+      if (scroll) {
+        requestAnimationFrame(() => {
+          const el = document.querySelector(`.sheet[data-id="${id}"]`);
+          if (!el) return;
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          el.classList.add('highlight');
+          setTimeout(() => el.classList.remove('highlight'), 1800);
+        });
+      }
+      return true;
+    }
+
+    async function copyPermalink(id, btn) {
+      const url = `${location.origin}${location.pathname}#${id}`;
+      history.replaceState(null, '', `#${id}`);
+      try {
+        await navigator.clipboard.writeText(url);
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 1400);
+      } catch {
+        // Clipboard API unavailable (e.g. insecure context) — the address bar
+        // now shows the right link anyway, so it can still be copied by hand.
+      }
+    }
+
+    addEventListener('hashchange', () => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      if (id) goToPoemId(id);
+    });
+
     async function loadPoems() {
       let n = 1;
+      let navigated = false;
       while (true) {
         const batch = await Promise.all(
           Array.from({ length: BATCH }, (_, i) => fetchPoem(n + i))
@@ -631,7 +753,11 @@
         if (found.length === 0) break;
         const prevLen = poems.length;
         poems.push(...found);
-        if (prevLen < currentPage * POEMS_PER_PAGE) renderPage(currentPage);
+        if (!navigated && location.hash) {
+          navigated = goToPoemId(decodeURIComponent(location.hash.slice(1)));
+        }
+        if (navigated) updatePagination();
+        else if (prevLen < currentPage * POEMS_PER_PAGE) renderPage(currentPage);
         else updatePagination();
         n += BATCH;
       }
@@ -653,6 +779,7 @@
         const idx = i - start;
         const sheet = document.createElement('article');
         sheet.className = 'sheet';
+        sheet.dataset.id = p.id;
         sheet.style.setProperty('--i', idx);
         sheet.style.setProperty('--tilt', TILTS[idx % TILTS.length] + 'deg');
 
@@ -672,6 +799,33 @@
         renderStanzas(body, p.body);
         sheet.appendChild(body);
 
+        if (p.tags && p.tags.length) {
+          const tagsRow = document.createElement('div');
+          tagsRow.className = 'tags';
+          for (const t of p.tags) {
+            const chip = document.createElement('span');
+            chip.className = 'tag';
+            // The icon is a placeholder (heart for every tag) until there's
+            // a per-tag icon mapping; the tag name lives on as the
+            // accessible name and hover title so it isn't lost in the
+            // meantime.
+            chip.setAttribute('role', 'img');
+            chip.setAttribute('aria-label', t);
+            chip.title = t;
+            const icon = document.createElement('span');
+            icon.className = 'tag-icon tag-icon--heart';
+            chip.appendChild(icon);
+            const cordBottom = document.createElement('span');
+            cordBottom.className = 'tag-cord-bottom';
+            chip.appendChild(cordBottom);
+            const tassel = document.createElement('span');
+            tassel.className = 'tag-tassel';
+            chip.appendChild(tassel);
+            tagsRow.appendChild(chip);
+          }
+          sheet.appendChild(tagsRow);
+        }
+
         const seal = document.createElement('div');
         seal.className = 'seal';
         seal.setAttribute('aria-hidden', 'true');
@@ -681,9 +835,36 @@
         seal.appendChild(img);
         sheet.appendChild(seal);
 
+        const permalink = document.createElement('button');
+        permalink.className = 'permalink';
+        permalink.type = 'button';
+        permalink.setAttribute('aria-label', 'Copy link to this poem');
+        permalink.title = 'Copy link to this poem';
+        permalink.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7a5 5 0 0 1 0-10h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>';
+        permalink.addEventListener('click', () => copyPermalink(p.id, permalink));
+        sheet.appendChild(permalink);
+
         list.appendChild(sheet);
         fadeObserver.observe(sheet);
       }
+      // Tags hang below the sheet and can wrap onto several lines on narrow
+      // screens, and each one's tassel hangs further still below its own
+      // row — none of that is captured by normal layout height, since it's
+      // all absolutely positioned overflow. Measure it for real (rather
+      // than hard-coding the tassel's reach) so it stays correct if the
+      // tassel's size ever changes, and give the sheet exactly that much
+      // extra bottom margin.
+      list.querySelectorAll('.tags').forEach(tagsRow => {
+        const rowBottom = tagsRow.getBoundingClientRect().bottom;
+        // With several tags wrapped onto multiple lines, only the tassels
+        // on the *last* line actually set the overhang — check them all
+        // rather than assuming DOM order matches visual row order.
+        let maxBottom = rowBottom;
+        tagsRow.querySelectorAll('.tag-tassel').forEach(t => {
+          maxBottom = Math.max(maxBottom, t.getBoundingClientRect().bottom);
+        });
+        tagsRow.closest('.sheet').style.marginBottom = `${46 + tagsRow.offsetHeight + (maxBottom - rowBottom)}px`;
+      });
       updatePagination();
     }
 
