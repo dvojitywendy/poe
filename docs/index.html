@@ -46,6 +46,9 @@
          at each side, used as a CSS mask so --seal supplies the colour. */
       --knot-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='7' width='10' height='10' rx='1.6' transform='rotate(45 12 12)'/%3E%3Ccircle cx='12' cy='3.2' r='2.3'/%3E%3Ccircle cx='20.8' cy='12' r='2.3'/%3E%3Ccircle cx='12' cy='20.8' r='2.3'/%3E%3Ccircle cx='3.2' cy='12' r='2.3'/%3E%3C/svg%3E");
       --heart-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12,21.35l-1.45-1.32C5.4,15.36,2,12.28,2,8.5C2,5.42,4.42,3,7.5,3c1.74,0,3.41,0.81,4.5,2.09C13.09,3.81,14.76,3,16.5,3C19.58,3,22,5.42,22,8.5c0,3.78-3.4,6.86-8.55,11.54L12,21.35z'/%3E%3C/svg%3E");
+      /* A small tassel: a rounded collar, then five fringe threads of
+         slightly uneven length for a less mechanical, hand-made look. */
+      --tassel-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 21'%3E%3Crect x='5.5' y='0' width='5' height='4' rx='2'/%3E%3Crect x='2.5' y='5' width='1.4' height='13' rx='0.7'/%3E%3Crect x='4.9' y='4.5' width='1.4' height='14' rx='0.7'/%3E%3Crect x='7.3' y='4' width='1.6' height='15.5' rx='0.8'/%3E%3Crect x='9.9' y='4.5' width='1.4' height='14' rx='0.7'/%3E%3Crect x='12.3' y='5' width='1.4' height='13' rx='0.7'/%3E%3C/svg%3E");
     }
     :root[data-theme="dark"] {
       --ground: #20130a;
@@ -226,6 +229,16 @@
     .tag-icon--heart {
       -webkit-mask: var(--heart-svg) center / contain no-repeat;
       mask: var(--heart-svg) center / contain no-repeat;
+    }
+    .tag-cord-bottom {
+      position: absolute; left: 50%; top: 100%; transform: translateX(-50%);
+      width: 1.5px; height: 7px; background: var(--seal);
+    }
+    .tag-tassel {
+      position: absolute; left: 50%; top: calc(100% + 7px); transform: translateX(-50%);
+      width: 14px; height: 18px; background: var(--seal);
+      -webkit-mask: var(--tassel-svg) center / contain no-repeat;
+      mask: var(--tassel-svg) center / contain no-repeat;
     }
     .poem-body { white-space: pre-wrap; font: 400 19px/1.78 var(--fb); color: var(--ink); }
     .poem-body .stanza { margin: 0 0 1.2em; }
@@ -802,6 +815,12 @@
             const icon = document.createElement('span');
             icon.className = 'tag-icon tag-icon--heart';
             chip.appendChild(icon);
+            const cordBottom = document.createElement('span');
+            cordBottom.className = 'tag-cord-bottom';
+            chip.appendChild(cordBottom);
+            const tassel = document.createElement('span');
+            tassel.className = 'tag-tassel';
+            chip.appendChild(tassel);
             tagsRow.appendChild(chip);
           }
           sheet.appendChild(tagsRow);
@@ -829,10 +848,22 @@
         fadeObserver.observe(sheet);
       }
       // Tags hang below the sheet and can wrap onto several lines on narrow
-      // screens; the base margin only clears a single row, so give sheets
-      // with tags exactly as much extra bottom margin as they measure out to.
+      // screens, and each one's tassel hangs further still below its own
+      // row — none of that is captured by normal layout height, since it's
+      // all absolutely positioned overflow. Measure it for real (rather
+      // than hard-coding the tassel's reach) so it stays correct if the
+      // tassel's size ever changes, and give the sheet exactly that much
+      // extra bottom margin.
       list.querySelectorAll('.tags').forEach(tagsRow => {
-        tagsRow.closest('.sheet').style.marginBottom = `${46 + tagsRow.offsetHeight}px`;
+        const rowBottom = tagsRow.getBoundingClientRect().bottom;
+        // With several tags wrapped onto multiple lines, only the tassels
+        // on the *last* line actually set the overhang — check them all
+        // rather than assuming DOM order matches visual row order.
+        let maxBottom = rowBottom;
+        tagsRow.querySelectorAll('.tag-tassel').forEach(t => {
+          maxBottom = Math.max(maxBottom, t.getBoundingClientRect().bottom);
+        });
+        tagsRow.closest('.sheet').style.marginBottom = `${46 + tagsRow.offsetHeight + (maxBottom - rowBottom)}px`;
       });
       updatePagination();
     }
