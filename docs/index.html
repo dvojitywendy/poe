@@ -193,7 +193,11 @@
     .sheet.visible { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
     .copyright { font: 600 12px/1.4 var(--fb); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; white-space: pre-line; }
     .sheet h2 { margin: 0 0 16px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
-    .tags { display: flex; flex-wrap: wrap; gap: 22px; margin: 34px 0 0; padding-top: 18px; }
+    .tags {
+      position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 22px;
+      width: max-content; max-width: calc(100% - 40px);
+    }
     .tag {
       position: relative;
       font: 600 11px/1 var(--fb); letter-spacing: .07em; text-transform: uppercase;
@@ -802,6 +806,12 @@
         list.appendChild(sheet);
         fadeObserver.observe(sheet);
       }
+      // Tags hang below the sheet and can wrap onto several lines on narrow
+      // screens; the base margin only clears a single row, so give sheets
+      // with tags exactly as much extra bottom margin as they measure out to.
+      list.querySelectorAll('.tags').forEach(tagsRow => {
+        tagsRow.closest('.sheet').style.marginBottom = `${46 + tagsRow.offsetHeight}px`;
+      });
       updatePagination();
     }
 
