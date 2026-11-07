@@ -193,14 +193,23 @@
     .sheet.visible { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
     .copyright { font: 600 12px/1.4 var(--fb); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; white-space: pre-line; }
     .sheet h2 { margin: 0 0 16px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 22px; margin: 34px 0 0; padding-top: 18px; }
     .tag {
-      display: inline-flex; align-items: center; gap: 6px;
+      position: relative;
       font: 600 11px/1 var(--fb); letter-spacing: .07em; text-transform: uppercase;
       color: var(--bamboo); background: var(--bamboo-soft);
-      border-radius: 999px; padding: 6px 12px 6px 10px;
+      border-radius: 999px; padding: 7px 13px;
     }
-    .tag::before { content: ''; width: 5px; height: 5px; flex: none; border-radius: 999px; background: currentColor; }
+    /* A short red cord with a bead, like a paper gift tag strung above it. */
+    .tag::before {
+      content: ''; position: absolute; left: 50%; top: -15px; transform: translateX(-50%);
+      width: 1.5px; height: 13px; background: var(--seal);
+    }
+    .tag::after {
+      content: ''; position: absolute; left: 50%; top: -18px; transform: translateX(-50%);
+      width: 7px; height: 7px; border-radius: 999px; background: var(--seal);
+      box-shadow: 0 0 0 2px var(--paper);
+    }
     .poem-body { white-space: pre-wrap; font: 400 19px/1.78 var(--fb); color: var(--ink); }
     .poem-body .stanza { margin: 0 0 1.2em; }
     .poem-body .stanza:last-child { margin-bottom: 0; }
@@ -755,6 +764,11 @@
         h2.textContent = p.title;
         sheet.appendChild(h2);
 
+        const body = document.createElement('div');
+        body.className = 'poem-body';
+        renderStanzas(body, p.body);
+        sheet.appendChild(body);
+
         if (p.tags && p.tags.length) {
           const tagsRow = document.createElement('div');
           tagsRow.className = 'tags';
@@ -766,11 +780,6 @@
           }
           sheet.appendChild(tagsRow);
         }
-
-        const body = document.createElement('div');
-        body.className = 'poem-body';
-        renderStanzas(body, p.body);
-        sheet.appendChild(body);
 
         const seal = document.createElement('div');
         seal.className = 'seal';
