@@ -192,7 +192,15 @@
     }
     .sheet.visible { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
     .copyright { font: 600 12px/1.4 var(--fb); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; white-space: pre-line; }
-    .sheet h2 { margin: 0 0 20px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
+    .sheet h2 { margin: 0 0 16px; font-family: var(--fh); font-weight: 600; font-size: 32px; line-height: 1.22; color: var(--bamboo); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px/1 var(--fb); letter-spacing: .07em; text-transform: uppercase;
+      color: var(--bamboo); background: var(--bamboo-soft);
+      border-radius: 999px; padding: 6px 12px 6px 10px;
+    }
+    .tag::before { content: ''; width: 5px; height: 5px; flex: none; border-radius: 999px; background: currentColor; }
     .poem-body { white-space: pre-wrap; font: 400 19px/1.78 var(--fb); color: var(--ink); }
     .poem-body .stanza { margin: 0 0 1.2em; }
     .poem-body .stanza:last-child { margin-bottom: 0; }
@@ -206,6 +214,29 @@
     }
     .seal img { display: block; width: 100%; height: 100%; }
     .seal.pressed { opacity: 1; transform: scale(1) rotate(-3deg); }
+
+    .permalink {
+      position: absolute; left: 46px; bottom: 28px; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none; border-radius: 999px;
+      color: var(--muted); opacity: .5; cursor: pointer; padding: 0;
+      transition: opacity .2s ease, color .2s ease, background-color .2s ease;
+    }
+    .permalink svg { width: 15px; height: 15px; }
+    .permalink:hover, .permalink:focus-visible { opacity: 1; color: var(--bamboo); background: var(--bamboo-soft); }
+    .permalink::after {
+      content: 'Copied'; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: var(--paper); font: 600 10px/1 var(--fb); letter-spacing: .05em;
+      padding: 5px 9px; border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .permalink.copied::after { opacity: 1; }
+
+    @keyframes sheetHighlight {
+      0%, 100% { box-shadow: var(--sheet-shadow), inset 0 1px 0 var(--paper-edge); }
+      25% { box-shadow: var(--sheet-shadow), inset 0 1px 0 var(--paper-edge), 0 0 0 3px var(--bamboo); }
+    }
+    .sheet.highlight { animation: sheetHighlight 1.8s ease; }
 
     .pagination { display: flex; align-items: center; justify-content: center; gap: 26px; margin: 8px 0 0; }
     .pagination button {
@@ -528,12 +559,21 @@
 
     function parsePoem(text) {
       let copyright = '';
+      let tags = [];
       const crMatch = text.match(/\/\*\*([\s\S]*?)\*\//);
       if (crMatch) {
-        copyright = crMatch[1]
+        const cleaned = crMatch[1]
           .replace(/^\s*\*\s?/gm, '')
-          .replace(/(\d{4})\s*-\s*\d{4}/, `$1-${CURRENT_YEAR}`)
-          .trim();
+          .replace(/(\d{4})\s*-\s*\d{4}/, `$1-${CURRENT_YEAR}`);
+        // An optional 'Tags: foo, bar' line anywhere in the comment block is
+        // pulled out into its own array instead of being shown as copyright text.
+        const keptLines = [];
+        for (const line of cleaned.split('\n')) {
+          const tagMatch = line.match(/^\s*tags?:\s*(.+?)\s*$/i);
+          if (tagMatch) tags = tagMatch[1].split(',').map(t => t.trim()).filter(Boolean);
+          else keptLines.push(line);
+        }
+        copyright = keptLines.join('\n').trim();
         text = text.replace(crMatch[0], '');
       }
       const lines = text.split('\n');
@@ -543,7 +583,7 @@
         title = lines[titleIdx].trim();
         body = lines.slice(titleIdx + 1).join('\n').trim();
       }
-      return { copyright, title, body };
+      return { copyright, title, body, tags };
     }
 
     function renderStanzas(container, body) {
@@ -613,16 +653,59 @@
 
     async function fetchPoem(n) {
       try {
-        const res = await fetch(`${String(n).padStart(3, '0')}.md`);
+        const id = String(n).padStart(3, '0');
+        const res = await fetch(`${id}.md`);
         if (!res.ok) return null;
-        return parsePoem(await res.text());
+        const parsed = parsePoem(await res.text());
+        parsed.id = id;
+        return parsed;
       } catch {
         return null;
       }
     }
 
+    /* ---------- Permalinks ---------- */
+    function goToPoemId(id, { scroll = true } = {}) {
+      const idx = poems.findIndex(p => p.id === id);
+      if (idx === -1) return false;
+      const targetPage = Math.floor(idx / POEMS_PER_PAGE) + 1;
+      if (targetPage !== currentPage) {
+        currentPage = targetPage;
+        renderPage(currentPage);
+      }
+      if (scroll) {
+        requestAnimationFrame(() => {
+          const el = document.querySelector(`.sheet[data-id="${id}"]`);
+          if (!el) return;
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          el.classList.add('highlight');
+          setTimeout(() => el.classList.remove('highlight'), 1800);
+        });
+      }
+      return true;
+    }
+
+    async function copyPermalink(id, btn) {
+      const url = `${location.origin}${location.pathname}#${id}`;
+      history.replaceState(null, '', `#${id}`);
+      try {
+        await navigator.clipboard.writeText(url);
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 1400);
+      } catch {
+        // Clipboard API unavailable (e.g. insecure context) — the address bar
+        // now shows the right link anyway, so it can still be copied by hand.
+      }
+    }
+
+    addEventListener('hashchange', () => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      if (id) goToPoemId(id);
+    });
+
     async function loadPoems() {
       let n = 1;
+      let navigated = false;
       while (true) {
         const batch = await Promise.all(
           Array.from({ length: BATCH }, (_, i) => fetchPoem(n + i))
@@ -631,7 +714,11 @@
         if (found.length === 0) break;
         const prevLen = poems.length;
         poems.push(...found);
-        if (prevLen < currentPage * POEMS_PER_PAGE) renderPage(currentPage);
+        if (!navigated && location.hash) {
+          navigated = goToPoemId(decodeURIComponent(location.hash.slice(1)));
+        }
+        if (navigated) updatePagination();
+        else if (prevLen < currentPage * POEMS_PER_PAGE) renderPage(currentPage);
         else updatePagination();
         n += BATCH;
       }
@@ -653,6 +740,7 @@
         const idx = i - start;
         const sheet = document.createElement('article');
         sheet.className = 'sheet';
+        sheet.dataset.id = p.id;
         sheet.style.setProperty('--i', idx);
         sheet.style.setProperty('--tilt', TILTS[idx % TILTS.length] + 'deg');
 
@@ -667,6 +755,18 @@
         h2.textContent = p.title;
         sheet.appendChild(h2);
 
+        if (p.tags && p.tags.length) {
+          const tagsRow = document.createElement('div');
+          tagsRow.className = 'tags';
+          for (const t of p.tags) {
+            const chip = document.createElement('span');
+            chip.className = 'tag';
+            chip.textContent = t;
+            tagsRow.appendChild(chip);
+          }
+          sheet.appendChild(tagsRow);
+        }
+
         const body = document.createElement('div');
         body.className = 'poem-body';
         renderStanzas(body, p.body);
@@ -680,6 +780,15 @@
         img.alt = '';
         seal.appendChild(img);
         sheet.appendChild(seal);
+
+        const permalink = document.createElement('button');
+        permalink.className = 'permalink';
+        permalink.type = 'button';
+        permalink.setAttribute('aria-label', 'Copy link to this poem');
+        permalink.title = 'Copy link to this poem';
+        permalink.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7a5 5 0 0 1 0-10h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>';
+        permalink.addEventListener('click', () => copyPermalink(p.id, permalink));
+        sheet.appendChild(permalink);
 
         list.appendChild(sheet);
         fadeObserver.observe(sheet);
